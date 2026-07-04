@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TempoTrack - Freelance Time & Productivity Tracker</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="TempoTrack is a premium, client-side, zero-cost time-tracking web application for freelancers and part-time workers. Tracks real-time timers and manual entries.">
+  
+  <!-- Preconnect and Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation Overlay (Mobile Only) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">
+            <i data-lucide="clock"></i>
+          </div>
+          <span class="brand-name">TempoTrack</span>
+        </div>
+        
+        <nav class="nav-menu">
+          <li class="nav-item">
+            <a class="nav-link active" data-view="dashboard" id="nav-dashboard">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-view="history" id="nav-history">
+              <i data-lucide="history"></i>
+              <span>Time Logs</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-view="analytics" id="nav-analytics">
+              <i data-lucide="bar-chart-3"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+        </nav>
+        
+        <!-- Cloud Sync Status Indicator -->
+        <div class="sync-status-indicator" id="syncStatusIndicatorBtn" title="Configure cloud database synchronization">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="cloud-off" id="syncStatusIcon"></i>
+            <span id="syncStatusText" style="font-weight: 500;">Sync: Local Only</span>
+          </div>
+          <i data-lucide="settings" style="width: 14px; height: 14px; opacity: 0.7;"></i>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark Mode">
+          <i data-lucide="sun" id="themeIcon"></i>
+          <span id="themeText">Light Mode</span>
+        </button>
+        
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">FL</div>
+          <div class="user-info">
+            <span class="user-name">Freelancer Mode</span>
+            <span class="user-role">Self-Employed</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Header Navigation -->
+    <header class="mobile-header">
+      <button class="menu-toggle" id="menuToggleBtn" aria-label="Open Navigation Menu">
+        <i data-lucide="menu"></i>
+      </button>
+      <div class="brand" style="margin-bottom: 0;">
+        <div class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px;">
+          <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+        </div>
+        <span class="brand-name" style="font-size: 1.1rem;">TempoTrack</span>
+      </div>
+      <button class="theme-toggle-btn" id="mobileThemeToggleBtn" style="padding: 8px;" aria-label="Toggle Dark Mode">
+        <i data-lucide="sun" style="width: 18px; height: 18px;"></i>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section class="view-section active" id="dashboard-view">
+        <div class="page-header">
+          <h1 class="page-title">Welcome back!</h1>
+          <p class="page-subtitle">Track your hours, evaluate your productivity, and export billing data.</p>
+        </div>
+
+        <!-- Metric Widgets -->
+        <div class="stats-grid">
+          <!-- Today Card -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-title">Hours Today</span>
+              <div class="stat-icon">
+                <i data-lucide="calendar-days"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="hours-today">0.00</div>
+            <div class="stat-period">
+              <span id="stat-today-date">Today's logs</span>
+            </div>
+          </div>
+          <!-- Week Card -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-title">Hours This Week</span>
+              <div class="stat-icon">
+                <i data-lucide="calendar-range"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="hours-week">0.00</div>
+            <div class="stat-period">
+              <span>Mon - Sun current week</span>
+            </div>
+          </div>
+          <!-- Month Card -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-title">Hours This Month</span>
+              <div class="stat-icon">
+                <i data-lucide="calendar"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="hours-month">0.00</div>
+            <div class="stat-period">
+              <span id="stat-month-name">Current month</span>
+            </div>
+          </div>
+          <!-- Year Card -->
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-title">Hours This Year</span>
+              <div class="stat-icon">
+                <i data-lucide="calendar-heart"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="hours-year">0.00</div>
+            <div class="stat-period">
+              <span id="stat-year-name">Current year</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Core Operations Grid -->
+        <div class="dashboard-actions-grid">
+          <!-- Timer Tracker Card -->
+          <div class="card" id="timer-card">
+            <div class="card-title">
+              <i data-lucide="hourglass" class="accent-color"></i>
+              <span>Active Time Tracker</span>
+            </div>
+            
+            <div class="timer-container">
+              <div class="timer-clock" id="timerClock">00:00:00</div>
+              
+              <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+                <label for="timerNote" class="form-label">Work Note (optional)</label>
+                <textarea class="timer-note-input" id="timerNote" placeholder="What are you working on right now? e.g., Website Redesign, UI Wireframing..."></textarea>
+                <!-- Recent Notes Chips container -->
+                <div class="notes-chips-container" id="timer-chips-container" style="display: none;">
+                  <span class="chip-label">Recent tasks:</span>
+                  <div class="notes-chips" id="timer-chips"></div>
+                </div>
+              </div>
+
+              <div class="timer-controls">
+                <button class="timer-btn start" id="startTimerBtn">
+                  <i data-lucide="play-circle"></i>
+                  <span>Check In</span>
+                </button>
+                <button class="timer-btn pause" id="pauseTimerBtn" style="display: none;">
+                  <i data-lucide="pause-circle"></i>
+                  <span>Pause</span>
+                </button>
+                <button class="timer-btn resume" id="resumeTimerBtn" style="display: none;">
+                  <i data-lucide="play-circle"></i>
+                  <span>Resume</span>
+                </button>
+                <button class="timer-btn stop" id="stopTimerBtn" style="display: none;">
+                  <i data-lucide="stop-circle"></i>
+                  <span>Check Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Card -->
+          <div class="card">
+            <div class="card-title">
+              <i data-lucide="plus-circle"></i>
+              <span>Log Manual Hours</span>
+            </div>
+            
+            <form id="quickManualForm" style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Segment Toggle -->
+              <div class="segment-toggle">
+                <button type="button" class="segment-btn active" id="toggleRangeBtn" data-type="range">Time Range</button>
+                <button type="button" class="segment-btn" id="toggleHoursBtn" data-type="hours">Total Hours</button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="manualDate">Date</label>
+                <input type="date" class="form-input" id="manualDate" required>
+              </div>
+
+              <!-- Container for Time Range inputs -->
+              <div class="form-row" id="manualTimeRow">
+                <div class="form-group">
+                  <label class="form-label" for="manualStart">Start Time</label>
+                  <input type="time" class="form-input" id="manualStart" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="manualEnd">End Time</label>
+                  <input type="time" class="form-input" id="manualEnd" required>
+                </div>
+              </div>
+
+              <!-- Container for Direct Hours input -->
+              <div class="form-group" id="manualHoursRow" style="display: none;">
+                <label class="form-label" for="manualHoursInput">Total Hours (e.g. 4.5)</label>
+                <input type="number" step="0.25" min="0.05" max="24" class="form-input" id="manualHoursInput" placeholder="Enter decimal hours...">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="manualNote">Notes</label>
+                <textarea class="form-input" id="manualNote" style="resize: vertical; min-height: 80px;" placeholder="Add description of tasks completed..." required></textarea>
+                <!-- Recent Notes Chips container -->
+                <div class="notes-chips-container" id="manual-chips-container" style="display: none;">
+                  <span class="chip-label">Recent tasks:</span>
+                  <div class="notes-chips" id="manual-chips"></div>
+                </div>
+              </div>
+
+              <!-- One-Click Preset Logs -->
+              <div class="presets-container">
+                <span class="chip-label">Quick Log for Today:</span>
+                <div class="presets-row">
+                  <button type="button" class="preset-btn" data-hours="1">+1 hr</button>
+                  <button type="button" class="preset-btn" data-hours="4">+4 hrs</button>
+                  <button type="button" class="preset-btn" data-hours="8">+8 hrs</button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 8px;" id="quickLogBtn">
+                <i data-lucide="check"></i>
+                <span>Save Time Log</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. TIME LOGS / HISTORY VIEW -->
+      <section class="view-section" id="history-view">
+        <div class="page-header" style="flex-direction: row; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1 class="page-title">Time Logs</h1>
+            <p class="page-subtitle">Review, edit, or delete work records and export billing summaries.</p>
+          </div>
+          <button class="btn btn-primary btn-small" id="historyAddLogBtn">
+            <i data-lucide="plus"></i>
+            <span>Add Log Entry</span>
+          </button>
+        </div>
+
+        <!-- Filter and Export Bar -->
+        <div class="history-filters">
+          <div class="filter-group">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label class="form-label" style="margin-bottom: 0;" for="filterMonth">Month:</label>
+              <select class="filter-select" id="filterMonth">
+                <option value="all">All Months</option>
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label class="form-label" style="margin-bottom: 0;" for="filterYear">Year:</label>
+              <select class="filter-select" id="filterYear">
+                <!-- Javascript will populate these options -->
+              </select>
+            </div>
+          </div>
+
+          <div class="export-group">
+            <button class="btn btn-secondary btn-small" id="exportCsvBtn" title="Export as CSV for spreadsheet software">
+              <i data-lucide="file-spreadsheet"></i>
+              <span>Export CSV</span>
+            </button>
+            <button class="btn btn-secondary btn-small" id="exportJsonBtn" title="Export as JSON for backups">
+              <i data-lucide="download"></i>
+              <span>Export JSON</span>
+            </button>
+            <button class="btn btn-secondary btn-small" id="importJsonBtn" title="Restore backups or import records">
+              <i data-lucide="upload"></i>
+              <span>Import JSON</span>
+            </button>
+            <button class="btn btn-secondary btn-small" id="clearAllBtn" style="background-color: var(--timer-red); color: white; border: none;" title="Delete all logs permanently">
+              <i data-lucide="trash-2"></i>
+              <span>Clear All</span>
+            </button>
+            <input type="file" id="importFile" accept=".json">
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Working Hours</th>
+                <th>Total Hours</th>
+                <th>Notes</th>
+                <th style="width: 100px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <!-- Logs populated via JavaScript -->
+            </tbody>
+          </table>
+          
+          <div class="empty-state" id="history-empty-state" style="display: none;">
+            <i data-lucide="calendar-x"></i>
+            <span class="empty-state-title">No time logs found</span>
+            <p>Try clearing filters or logging manual/timer hours to see data.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ANALYTICS & CHARTS VIEW -->
+      <section class="view-section" id="analytics-view">
+        <div class="page-header">
+          <h1 class="page-title">Analytics Dashboard</h1>
+          <p class="page-subtitle">Understand monthly work hour distributions and analyze annual stats.</p>
+        </div>
+
+        <div class="analytics-grid">
+          <!-- Column 1: Chart Container -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div class="card-title">
+                <i data-lucide="bar-chart-4" class="accent-color"></i>
+                <span id="chart-title-text">Annual Distribution (2026)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label class="form-label" style="margin-bottom: 0;" for="analyticsYearSelect">Select Year:</label>
+                <select class="filter-select" id="analyticsYearSelect">
+                  <!-- Javascript will populate these options -->
+                </select>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <canvas id="hoursChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Column 2: Breakdown table -->
+          <div class="card">
+            <div class="card-title">
+              <i data-lucide="list-ordered"></i>
+              <span>Monthly Breakdown</span>
+            </div>
+            
+            <div class="breakdown-list" id="monthly-breakdown-list">
+              <!-- Months populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FLOATING TOAST NOTIFICATION -->
+  <div class="toast" id="toast">
+    <i data-lucide="check" id="toastIcon"></i>
+    <span id="toastMessage">Log recorded successfully</span>
+  </div>
+
+  <!-- MODAL: MANUAL ENTRY DIALOG -->
+  <div class="modal-overlay" id="manualEntryModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">New Time Log Entry</h2>
+        <button class="modal-close" id="closeManualModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="modalManualForm">
+        <div class="modal-body">
+          <!-- Segment Toggle -->
+          <div class="segment-toggle">
+            <button type="button" class="segment-btn active" id="modalToggleRangeBtn" data-type="range">Time Range</button>
+            <button type="button" class="segment-btn" id="modalToggleHoursBtn" data-type="hours">Total Hours</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modalManualDate">Date</label>
+            <input type="date" class="form-input" id="modalManualDate" required>
+          </div>
+
+          <!-- Container for Time Range inputs -->
+          <div class="form-row" id="modalManualTimeRow">
+            <div class="form-group">
+              <label class="form-label" for="modalManualStart">Start Time</label>
+              <input type="time" class="form-input" id="modalManualStart" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="modalManualEnd">End Time</label>
+              <input type="time" class="form-input" id="modalManualEnd" required>
+            </div>
+          </div>
+
+          <!-- Container for Direct Hours input -->
+          <div class="form-group" id="modalManualHoursRow" style="display: none;">
+            <label class="form-label" for="modalManualHoursInput">Total Hours (e.g. 4.5)</label>
+            <input type="number" step="0.25" min="0.05" max="24" class="form-input" id="modalManualHoursInput" placeholder="Enter decimal hours...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modalManualNote">Notes / Project details</label>
+            <textarea class="form-input" id="modalManualNote" style="resize: vertical; min-height: 100px;" placeholder="Add description of work completed..." required></textarea>
+            <!-- Recent Notes Chips container -->
+            <div class="notes-chips-container" id="modal-chips-container" style="display: none;">
+              <span class="chip-label">Recent tasks:</span>
+              <div class="notes-chips" id="modal-chips"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelManualModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i>
+            <span>Save Log</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ENTRY DIALOG -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Time Log Entry</h2>
+        <button class="modal-close" id="closeEditModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="editForm">
+        <input type="hidden" id="editRecordId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="editDate">Date</label>
+            <input type="date" class="form-input" id="editDate" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editStart">Start Time</label>
+              <input type="time" class="form-input" id="editStart" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editEnd">End Time</label>
+              <input type="time" class="form-input" id="editEnd" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editMethod">Tracking Method</label>
+            <select class="form-input" id="editMethod" required>
+              <option value="Timer">Timer</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editNote">Notes / Project details</label>
+            <textarea class="form-input" id="editNote" style="resize: vertical; min-height: 100px;" placeholder="Add description of work completed..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelEditModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CLOUD SYNC SETTINGS DIALOG -->
+  <div class="modal-overlay" id="syncModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">Cloud Database Sync</h2>
+        <button class="modal-close" id="closeSyncModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+          Synchronize your time logs across multiple devices (e.g. phone and Mac) using a private sync passphrase.
+        </p>
+        
+        <div class="form-group" style="margin-top: 8px;">
+          <label class="form-label" for="syncPassphrase">Private Sync Passphrase</label>
+          <input type="text" class="form-input" id="syncPassphrase" placeholder="e.g. my-private-project-key" autocomplete="off">
+          <span style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; margin-top: 4px; display: inline-block;">
+            Choose a unique secret key. Enter the exact same key on all your devices to merge and sync logs.
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px; padding: 14px; border-radius: var(--radius-md); background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+            <span style="color: var(--text-secondary); font-weight: 500;">Connection Status:</span>
+            <span id="syncModalStatus" style="font-weight: 600; color: var(--text-muted);">Disconnected (Local)</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;" id="syncLastTimeRow">
+            <span style="color: var(--text-secondary); font-weight: 500;">Last Synced:</span>
+            <span id="syncModalLastTime" style="color: var(--text-muted);">Never</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-secondary btn-small" style="background-color: var(--timer-red); color: white; border: none; display: none;" id="disableSyncBtn">
+          <i data-lucide="cloud-off"></i>
+          <span>Disable Sync</span>
+        </button>
+        <div style="display: flex; gap: 8px; margin-left: auto;">
+          <button type="button" class="btn btn-secondary" id="cancelSyncModalBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveSyncBtn">
+            <i data-lucide="cloud-lightning"></i>
+            <span>Enable Sync</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load library scripts from CDN -->
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

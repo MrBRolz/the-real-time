@@ -1,0 +1,20 @@
+databases:
+  - name: tempotrack-db
+    plan: free
+    databaseName: tempotrack
+    user: tempotrack_user
+
+services:
+  - type: web
+    name: tempotrack-app
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run db:migrate
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tempotrack-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production

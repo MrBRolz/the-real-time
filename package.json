@@ -1,0 +1,23 @@
+{
+  "name": "tempotrack",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node migrate.js",
+    "push": "node push-to-github.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "beta",
+    "express": "^4.19.2",
+    "isomorphic-git": "^1.38.6",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "drizzle-kit": "beta"
+  }
+}
