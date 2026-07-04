@@ -9,8 +9,8 @@ services:
     name: tempotrack-app
     runtime: node
     plan: free
-    buildCommand: npm install && npm run db:migrate
-    startCommand: npm start
+    buildCommand: npm install
+    startCommand: npm run db:migrate && npm start
     envVars:
       - key: DATABASE_URL
         fromDatabase:
